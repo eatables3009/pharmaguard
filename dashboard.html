@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PharmaGuard</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --surface-0:#0e0e0d; --surface-1:#1a1a19; --surface-2:#242423; --border:#3a3a37;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#8a8a80;
+    --series-1:#3987e5;   /* temperature line */
+    --critical:#d03b3b;   /* breach / HIGH */
+    --warning:#fab219;    /* MEDIUM / escalated */
+    --good:#0ca30c;       /* LOW / resolved */
+    --serious:#ec835a;    /* awaiting approval */
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--surface-0); color:var(--text-primary);
+    font:16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  header { display:flex; flex-wrap:wrap; align-items:baseline; gap:12px 18px; padding:18px 24px;
+    background:var(--surface-1); border-bottom:1px solid var(--border); }
+  h1 { margin:0; font-size:34px; letter-spacing:-.5px; }
+  .pill { font-size:13px; text-transform:uppercase; letter-spacing:1.2px; color:var(--text-muted);
+    border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
+  .pill.vertical { color:var(--series-1); border-color:var(--series-1); font-weight:700; }
+  .spacer { flex:1 1 auto; }
+  button { font:inherit; font-weight:600; cursor:pointer; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface-2); color:var(--text-primary); padding:9px 16px; }
+  button:hover { border-color:var(--text-secondary); }
+  button.primary { background:var(--good); border-color:var(--good); color:#fff; font-size:18px; padding:12px 22px; }
+  button.ghost { font-weight:500; color:var(--text-secondary); }
+  button.tab[aria-selected="true"] { border-color:var(--series-1); background:#15283d; }
+  input { font:inherit; background:var(--surface-0); color:var(--text-primary); border:1px solid var(--border);
+    border-radius:8px; padding:8px 10px; width:150px; }
+  main { padding:20px 24px 48px; display:grid; gap:20px; }
+  .card { background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:18px 20px; }
+  .card h2 { margin:0 0 14px; font-size:20px; color:var(--text-secondary); font-weight:600; letter-spacing:.3px; }
+  .tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:18px; }
+  .tile { background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; }
+  .tile .label { font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+  .tile .value { font-size:38px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.15; }
+  .tile .value small { font-size:18px; font-weight:600; color:var(--text-secondary); }
+  .key { display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin-top:10px; font-size:14px; color:var(--text-secondary); }
+  .key span { display:inline-flex; align-items:center; gap:7px; }
+  .swatch { width:16px; height:4px; border-radius:2px; background:var(--series-1); }
+  .swatch.dot { width:12px; height:12px; border-radius:50%; background:var(--critical); }
+  .swatch.band { width:16px; height:14px; border-radius:3px; background:rgba(255,255,255,.1); border:1px dashed var(--text-muted); }
+  svg { display:block; width:100%; height:auto; }
+  .incident { border:1px solid var(--border); border-left:6px solid var(--border); border-radius:10px;
+    padding:16px 18px; margin-bottom:16px; background:var(--surface-2); }
+  .incident.HIGH { border-left-color:var(--critical); }
+  .incident.MEDIUM { border-left-color:var(--warning); }
+  .incident.LOW { border-left-color:var(--good); }
+  .inc-head { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; }
+  .inc-head .id { font-size:24px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .badge { font-size:15px; font-weight:700; letter-spacing:.6px; padding:4px 12px; border-radius:999px; border:2px solid currentColor; }
+  .badge.HIGH { color:var(--critical); } .badge.MEDIUM { color:var(--warning); } .badge.LOW { color:var(--good); }
+  .badge.type { color:var(--text-secondary); border-style:solid; border-width:1px; font-weight:600; font-size:14px; }
+  .status { font-size:15px; font-weight:600; color:var(--text-secondary); letter-spacing:.6px; }
+  .status.RESOLVED { color:var(--good); }
+  .status.AWAITING_APPROVAL { color:var(--serious); }
+  .status.ESCALATED { color:var(--warning); }
+  .money { font-size:24px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .inc-body { margin-top:12px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); }
+  dl { margin:0; font-size:15px; }
+  dt { color:var(--text-muted); font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-top:8px; }
+  dd { margin:2px 0 0; color:var(--text-primary); }
+  ol.timeline { margin:6px 0 0; padding-left:20px; font-size:15px; color:var(--text-secondary); }
+  ol.timeline strong { color:var(--text-primary); }
+  table { border-collapse:collapse; width:100%; font-size:14px; font-variant-numeric:tabular-nums; }
+  th, td { text-align:left; padding:5px 12px 5px 0; border-bottom:1px solid var(--border); color:var(--text-secondary); }
+  th { color:var(--text-muted); text-transform:uppercase; font-size:12px; letter-spacing:1px; }
+  .muted { color:var(--text-muted); } .err { color:var(--critical); font-weight:600; }
+  .expiry-soon { color:var(--critical); font-weight:700; }
+  #tooltip { position:fixed; pointer-events:none; display:none; z-index:10; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:15px;
+    font-variant-numeric:tabular-nums; box-shadow:0 6px 20px rgba(0,0,0,.5); }
+</style>
+</head>
+<body>
+<header>
+  <h1>PharmaGuard</h1>
+  <span class="pill vertical" id="vertical">–</span>
+  <span class="pill">Simulated data</span>
+  <span class="spacer"></span>
+  <span id="conn" class="muted">connecting…</span>
+  <input id="apikey" type="password" placeholder="X-API-Key (optional)" autocomplete="off">
+  <button class="ghost" id="reset">Reset demo</button>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Live cold-chain temperature</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="tiles" id="tiles"></div>
+    <svg id="chart" viewBox="0 0 1000 380" role="img"
+         aria-label="Temperature in degrees Celsius over time for the selected shipment"></svg>
+    <div class="key">
+      <span><i class="swatch"></i> Temperature</span>
+      <span><i class="swatch dot"></i> Breach reading (outside the safe band)</span>
+      <span><i class="swatch band"></i> <span id="band-label">Safe band</span></span>
+      <button class="ghost" id="toggle-table" style="padding:2px 10px">Show data table</button>
+    </div>
+    <div id="table-wrap" hidden style="margin-top:14px; max-height:260px; overflow:auto"></div>
+  </section>
+
+  <section class="card">
+    <h2>Incidents</h2>
+    <div id="incidents"><p class="muted">No incidents. Cold chain nominal.</p></div>
+  </section>
+</main>
+<div id="tooltip"></div>
+
+<script>
+const API = location.origin.startsWith("http") ? location.origin : "http://localhost:8000";
+const POLL_MS = 2000;
+let selected = null, readings = [], minC = null, maxC = null, incidents = [], shipments = [];
+
+const keyInput = document.getElementById("apikey");
+keyInput.value = localStorage.getItem("pg_api_key") || "";
+keyInput.addEventListener("change", () => localStorage.setItem("pg_api_key", keyInput.value));
+
+const hdrs = json => {
+  const h = json ? { "Content-Type": "application/json" } : {};
+  if (keyInput.value) h["X-API-Key"] = keyInput.value;
+  return h;
+};
+async function get(path) {
+  const r = await fetch(API + path, { headers: hdrs(false) });
+  if (!r.ok) throw new Error(path + " -> " + r.status);
+  return r.json();
+}
+async function post(path, body) {
+  const r = await fetch(API + path, { method: "POST", headers: hdrs(true), body: JSON.stringify(body || {}) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.detail || d.error || ("HTTP " + r.status));
+  return d;
+}
+const inr = n => "₹" + Number(n || 0).toLocaleString("en-IN");
+const clock = ts => new Date(ts).toLocaleTimeString("en-IN", { hour12: false });
+
+async function refresh() {
+  const conn = document.getElementById("conn");
+  try {
+    const health = await get("/health");
+    document.getElementById("vertical").textContent = health.vertical;
+    shipments = (await get("/shipments")).shipments;
+    if (!shipments.some(s => s.shipment_id === selected)) selected = shipments[0]?.shipment_id || null;
+    const [hist, inc] = await Promise.all([get("/readings/" + selected), get("/incidents")]);
+    readings = hist.readings.filter(r => r.temp_c !== undefined);
+    minC = hist.min_c; maxC = hist.max_c; incidents = inc.incidents;
+    document.getElementById("band-label").textContent =
+      minC === null ? "No temperature rule" : `Safe band ${minC} to ${maxC} °C`;
+    conn.textContent = "live · " + clock(new Date().toISOString());
+    conn.className = "muted";
+    renderTabs(); renderTiles(); renderChart(); renderTable(); renderIncidents();
+  } catch (e) {
+    conn.textContent = "backend unreachable: " + e.message;
+    conn.className = "err";
+  }
+}
+
+function renderTabs() {
+  const el = document.getElementById("tabs");
+  el.innerHTML = "";
+  shipments.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "tab";
+    b.setAttribute("aria-selected", String(s.shipment_id === selected));
+    b.textContent = s.shipment_id + " → " + s.destination;
+    b.onclick = () => { selected = s.shipment_id; refresh(); };
+    el.appendChild(b);
+  });
+}
+
+function renderTiles() {
+  const last = readings[readings.length - 1];
+  const open = incidents.filter(i => i.status !== "RESOLVED");
+  const atRisk = open.reduce((a, i) => a + i.value_at_risk_inr, 0);
+  const mine = open.find(i => i.shipment_id === selected && i.type === "TEMP_EXCURSION");
+  const color = last && !last.in_range ? "var(--critical)" : "var(--text-primary)";
+  document.getElementById("tiles").innerHTML = `
+    <div class="tile"><div class="label">Latest temperature</div>
+      <div class="value" style="color:${color}">${last ? last.temp_c.toFixed(1) : "–"}<small> °C</small></div></div>
+    <div class="tile"><div class="label">Time outside range</div>
+      <div class="value">${mine ? (mine.detail.minutes_out_of_range ?? 0) : 0}<small> min</small></div></div>
+    <div class="tile"><div class="label">Open incidents</div>
+      <div class="value">${open.length}</div></div>
+    <div class="tile"><div class="label">Value at risk</div>
+      <div class="value">${inr(atRisk)}</div></div>`;
+}
+
+function renderChart() {
+  const svg = document.getElementById("chart");
+  const W = 1000, H = 380, L = 72, R = 24, T = 20, B = 44;
+  if (!readings.length) {
+    svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="#8a8a80" font-size="22">
+      Waiting for sensor readings — start simulator.py</text>`;
+    return;
+  }
+  const temps = readings.map(r => r.temp_c);
+  const lo = minC === null ? Math.min(...temps) : minC, hi = maxC === null ? Math.max(...temps) : maxC;
+  const yMin = Math.floor(Math.min(lo - 2, ...temps) - 1);
+  const yMax = Math.ceil(Math.max(hi + 6, ...temps) + 1);
+  const step = Math.max(2, Math.ceil((yMax - yMin) / 8));
+  const x = i => L + (readings.length === 1 ? (W - L - R) / 2 : i * (W - L - R) / (readings.length - 1));
+  const y = t => T + (yMax - t) * (H - T - B) / (yMax - yMin);
+  const p = [];
+
+  if (minC !== null) {   // safe band: recessive fill, dashed labelled bounds
+    p.push(`<rect x="${L}" y="${y(maxC)}" width="${W - L - R}" height="${y(minC) - y(maxC)}" fill="rgba(255,255,255,.10)"/>`);
+    [minC, maxC].forEach(v => p.push(`<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"
+      stroke="#8a8a80" stroke-width="1.5" stroke-dasharray="7 6"/>`));
+    p.push(`<text x="${W - R}" y="${y(maxC) - 9}" text-anchor="end" fill="#c3c2b7" font-size="17" font-weight="600">
+      safe band ${minC} to ${maxC} °C</text>`);
+  }
+  for (let t = yMin; t <= yMax; t += step) {
+    p.push(`<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="#3a3a37" stroke-width="1"/>`);
+    p.push(`<text x="${L - 12}" y="${y(t) + 7}" text-anchor="end" fill="#8a8a80" font-size="18"
+      font-variant-numeric="tabular-nums">${t}</text>`);
+  }
+  p.push(`<text x="${L - 12}" y="${T - 4}" text-anchor="end" fill="#8a8a80" font-size="14">°C</text>`);
+
+  for (let i = 1; i < readings.length; i++) {
+    const breach = !readings[i].in_range || !readings[i - 1].in_range;
+    p.push(`<line x1="${x(i - 1)}" y1="${y(temps[i - 1])}" x2="${x(i)}" y2="${y(temps[i])}"
+      stroke="${breach ? "#d03b3b" : "#3987e5"}" stroke-width="3" stroke-linecap="round"/>`);
+  }
+  readings.forEach((r, i) => {
+    if (!r.in_range) p.push(`<circle cx="${x(i)}" cy="${y(r.temp_c)}" r="5.5" fill="#d03b3b" stroke="#1a1a19" stroke-width="2"/>`);
+  });
+  const li = readings.length - 1, last = readings[li];
+  p.push(`<circle cx="${x(li)}" cy="${y(last.temp_c)}" r="8" fill="${last.in_range ? "#3987e5" : "#d03b3b"}"
+    stroke="#1a1a19" stroke-width="2"/>`);
+  p.push(`<text x="${x(li) - 14}" y="${y(last.temp_c) - 16}" text-anchor="end" font-size="26" font-weight="700"
+    fill="${last.in_range ? "#ffffff" : "#d03b3b"}" font-variant-numeric="tabular-nums">${last.temp_c.toFixed(1)} °C</text>`);
+
+  p.push(`<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="#3a3a37" stroke-width="1"/>`);
+  [0, Math.floor(li / 2), li].filter((v, i, a) => a.indexOf(v) === i).forEach(i => {
+    p.push(`<text x="${x(i)}" y="${H - B + 26}" text-anchor="middle" fill="#8a8a80" font-size="16">${clock(readings[i].ts)}</text>`);
+  });
+  p.push(`<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent"/>`);
+  p.push(`<line id="cross" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="#c3c2b7" stroke-width="1" visibility="hidden"/>`);
+  svg.innerHTML = p.join("");
+
+  const tip = document.getElementById("tooltip"), cross = svg.querySelector("#cross");
+  svg.onmousemove = ev => {
+    const box = svg.getBoundingClientRect(), svgX = (ev.clientX - box.left) * W / box.width;
+    let best = 0;
+    readings.forEach((_, i) => { if (Math.abs(x(i) - svgX) < Math.abs(x(best) - svgX)) best = i; });
+    const r = readings[best];
+    cross.setAttribute("x1", x(best)); cross.setAttribute("x2", x(best));
+    cross.setAttribute("visibility", "visible");
+    tip.style.display = "block";
+    tip.style.left = Math.min(ev.clientX + 16, innerWidth - 230) + "px";
+    tip.style.top = (ev.clientY - 60) + "px";
+    tip.innerHTML = `<strong>${r.temp_c.toFixed(2)} °C</strong><br>${clock(r.ts)}<br>
+      <span style="color:${r.in_range ? "#c3c2b7" : "#d03b3b"}">${r.in_range ? "in range" : "BREACH"}</span>`;
+  };
+  svg.onmouseleave = () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); };
+}
+
+function renderTable() {
+  const rows = readings.slice().reverse().map(r =>
+    `<tr><td>${clock(r.ts)}</td><td>${r.temp_c.toFixed(2)} °C</td>
+     <td style="color:${r.in_range ? "var(--text-secondary)" : "var(--critical)"}">${r.in_range ? "in range" : "breach"}</td></tr>`).join("");
+  document.getElementById("table-wrap").innerHTML =
+    `<table><thead><tr><th>Time</th><th>Temp</th><th>State</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+document.getElementById("toggle-table").onclick = ev => {
+  const w = document.getElementById("table-wrap");
+  w.hidden = !w.hidden;
+  ev.target.textContent = w.hidden ? "Show data table" : "Hide data table";
+};
+
+const SEV_MARK = { HIGH: "▲", MEDIUM: "●", LOW: "▪" };
+
+function renderIncidents() {
+  const el = document.getElementById("incidents");
+  if (!incidents.length) { el.innerHTML = '<p class="muted">No incidents. Cold chain nominal.</p>'; return; }
+  el.innerHTML = incidents.map(i => {
+    const soonest = i.affected_batches.length ? Math.min(...i.affected_batches.map(b => b.days_left)) : null;
+    const batches = i.affected_batches.map(b => {
+      const bits = [`${b.batch_id} · ${b.product_name} · ${b.units} u`];
+      if (b.deviation_c) bits.push(`${b.deviation_c} °C out`);
+      if (b.effective_days_left !== undefined) bits.push(`${b.effective_days_left} d left on arrival`);
+      return bits.join(" · ");
+    }).join("<br>");
+    const rr = i.replacement_request;
+    const act = i.recommended_action;
+    const approve = i.status === "AWAITING_APPROVAL"
+      ? `<button class="primary" onclick="approve('${i.id}','${act.code}')">Approve ${act.code.replace(/_/g, " ").toLowerCase()}</button>` : "";
+    return `<div class="incident ${i.severity}">
+      <div class="inc-head">
+        <span class="id">${i.id}</span>
+        <span class="badge type">${i.type.replace(/_/g, " ")}</span>
+        <span class="badge ${i.severity}">${SEV_MARK[i.severity]} ${i.severity}</span>
+        <span class="status ${i.status}">${i.status.replace(/_/g, " ")}</span>
+        <span class="muted">${i.shipment_id} · ETA ${i.eta_hours} h${soonest !== null ?
+          ` · <span class="${soonest <= 2 ? "expiry-soon" : "muted"}">expiry in ${soonest} d</span>` : ""}</span>
+        <span class="spacer"></span>
+        <span class="money">${inr(i.value_at_risk_inr)}</span>
+        ${approve}
+      </div>
+      <div class="inc-body">
+        <dl>
+          <dt>Affected batches</dt><dd>${batches || "–"}</dd>
+          <dt>Destination</dt><dd>${i.destination.name}<br><span class="muted">${i.destination.contact_person} · ${i.destination.phone}</span></dd>
+          <dt>Carrier</dt><dd>${i.carrier.name}<br><span class="muted">${i.carrier.dispatcher_name} · ${i.carrier.phone}</span></dd>
+          <dt>Recommended action</dt><dd><strong>${act.code.replace(/_/g, " ")}</strong> — ${act.text}
+            ${act.needs_human_approval ? '<br><span class="expiry-soon">needs human approval</span>' : ""}</dd>
+          ${rr ? `<dt>Replacement request</dt><dd>${rr.units} × ${rr.product_name}<br>
+            <span class="muted">${rr.supplier_name} · ETA ${rr.eta_hours} h · ${inr(rr.estimated_cost_inr)} · ${rr.approved ? "approved" : "awaiting human approval"}</span></dd>` : ""}
+          ${i.escalation_summary ? `<dt>AI handoff summary</dt><dd>${i.escalation_summary}</dd>` : ""}
+          ${i.approval ? `<dt>Approved by</dt><dd>${i.approval.approver} at ${clock(i.approval.approved_at)}</dd>` : ""}
+        </dl>
+        <div>
+          <dt>Timeline</dt>
+          <ol class="timeline">${i.timeline.map(t =>
+            `<li>${clock(t.ts)} · <strong>${t.actor}</strong> · ${t.action}${t.note ? " — " + t.note : ""}</li>`).join("")}</ol>
+        </div>
+      </div></div>`;
+  }).join("");
+}
+
+async function approve(id, code) {
+  const who = prompt(`Approve ${code} on ${id}. Approver name (human):`, "Dr. Meera Iyer");
+  if (!who) return;
+  try { await post(`/incidents/${id}/approve`, { approver: who, note: "Approved from PharmaGuard dashboard." }); }
+  catch (e) { alert("Approval failed: " + e.message); }
+  refresh();
+}
+
+document.getElementById("reset").onclick = async () => {
+  if (!confirm("Clear all incidents and sensor readings?")) return;
+  try { await post("/reset"); } catch (e) { alert("Reset failed: " + e.message); }
+  readings = []; incidents = []; refresh();
+};
+
+refresh();
+setInterval(refresh, POLL_MS);
+</script>
+</body>
+</html>

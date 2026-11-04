@@ -1,0 +1,80 @@
+{
+  "vertical": "pharma",
+  "currency": "INR",
+  "note": "Simulated hackathon data. Phone numbers are placeholders. expiry_date accepts '+Nd' (N days from server start) so the demo never goes stale.",
+  "products": [
+    {
+      "id": "P-INS", "name": "Human Insulin (10 mL vial)", "unit_value_inr": 850,
+      "handling": {
+        "temp_c": { "min": 2, "max": 8, "tolerance_min": 60 },
+        "humidity_pct": { "max": 65 },
+        "shelf_life_days": 730, "light_sensitive": true, "fragile": true, "controlled": false
+      }
+    },
+    {
+      "id": "P-HEPB", "name": "Hepatitis B Vaccine (adult dose)", "unit_value_inr": 420,
+      "handling": {
+        "temp_c": { "min": 2, "max": 8, "tolerance_min": 45 },
+        "humidity_pct": null,
+        "shelf_life_days": 730, "light_sensitive": true, "fragile": true, "controlled": false
+      }
+    },
+    {
+      "id": "P-RAB", "name": "Rabies Vaccine (post-exposure dose)", "unit_value_inr": 1150,
+      "handling": {
+        "temp_c": { "min": 2, "max": 8, "tolerance_min": 30 },
+        "humidity_pct": null,
+        "shelf_life_days": 1095, "light_sensitive": true, "fragile": true, "controlled": true
+      }
+    }
+  ],
+  "destinations": [
+    { "id": "PH-1", "name": "Jayanagar Family Pharmacy", "type": "pharmacy",
+      "address": "11th Main, Jayanagar 4th Block, Bengaluru 560011",
+      "contact_person": "Ms. Latha R", "phone": "+910000000001" },
+    { "id": "PH-2", "name": "Whitefield Care Chemists", "type": "pharmacy",
+      "address": "ITPL Main Road, Whitefield, Bengaluru 560066",
+      "contact_person": "Mr. Arun Kumar", "phone": "+910000000002" }
+  ],
+  "carriers": [
+    { "id": "CR-1", "name": "ColdLink Logistics (Bengaluru hub)",
+      "dispatcher_name": "Mr. Suresh Babu", "phone": "+910000000003" }
+  ],
+  "shipments": [
+    {
+      "id": "SHP-1001", "origin": "PharmaGuard Central Warehouse, Peenya, Bengaluru",
+      "destination_id": "PH-1", "carrier_id": "CR-1",
+      "vehicle": "KA-01-AB-4412 (refrigerated van)", "eta_hours": 3.5,
+      "batches": [
+        { "batch_id": "B-INS-77", "product_id": "P-INS", "units": 120, "expiry_date": "+400d" },
+        { "batch_id": "B-HEPB-12", "product_id": "P-HEPB", "units": 60, "expiry_date": "+2d" }
+      ]
+    },
+    {
+      "id": "SHP-1002", "origin": "PharmaGuard Central Warehouse, Peenya, Bengaluru",
+      "destination_id": "PH-2", "carrier_id": "CR-1",
+      "vehicle": "KA-05-CD-9931 (refrigerated van)", "eta_hours": 5.0,
+      "batches": [
+        { "batch_id": "B-RAB-31", "product_id": "P-RAB", "units": 80, "expiry_date": "+300d" }
+      ]
+    }
+  ],
+  "suppliers": [
+    { "id": "SUP-1", "name": "Karnataka Cold Pharma Distributors", "city": "Bengaluru (Rajajinagar)",
+      "contact_person": "Mr. Girish N", "phone": "+910000000011", "approved": true,
+      "stock": { "P-INS": 240, "P-HEPB": 180, "P-RAB": 40 },
+      "eta_hours": { "P-INS": 3, "P-HEPB": 3, "P-RAB": 4 } },
+    { "id": "SUP-2", "name": "Deccan Biologicals Depot", "city": "Bengaluru (Hebbal)",
+      "contact_person": "Ms. Priya Menon", "phone": "+910000000012", "approved": true,
+      "stock": { "P-INS": 90, "P-HEPB": 300, "P-RAB": 150 },
+      "eta_hours": { "P-INS": 2, "P-HEPB": 6, "P-RAB": 5 } },
+    { "id": "SUP-3", "name": "Nandi Hills MedSupply", "city": "Chikkaballapur",
+      "contact_person": "Mr. Mahesh Rao", "phone": "+910000000013", "approved": true,
+      "stock": { "P-INS": 500, "P-HEPB": 20, "P-RAB": 200 },
+      "eta_hours": { "P-INS": 8, "P-HEPB": 8, "P-RAB": 9 } },
+    { "id": "SUP-4", "name": "QuickMeds Bulk Traders (UNAPPROVED decoy)", "city": "Bengaluru (KR Market)",
+      "contact_person": "Unverified vendor", "phone": "+910000000014", "approved": false,
+      "stock": { "P-INS": 9999, "P-HEPB": 9999, "P-RAB": 9999 },
+      "eta_hours": { "P-INS": 1, "P-HEPB": 1, "P-RAB": 1 } }
+  ]
+}

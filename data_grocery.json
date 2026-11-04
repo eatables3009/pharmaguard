@@ -1,0 +1,231 @@
+{
+  "vertical": "grocery",
+  "currency": "INR",
+  "note": "Same engine, supermarket vertical. Simulated data; placeholder phone numbers.",
+  "products": [
+    {
+      "id": "G-MILK",
+      "name": "Toned Milk (1 L pouch)",
+      "unit_value_inr": 58,
+      "handling": {
+        "temp_c": {
+          "min": 2,
+          "max": 4,
+          "tolerance_min": 30
+        },
+        "humidity_pct": null,
+        "shelf_life_days": 7,
+        "light_sensitive": false,
+        "fragile": false,
+        "controlled": false
+      }
+    },
+    {
+      "id": "G-ICE",
+      "name": "Ice Cream (1 L tub)",
+      "unit_value_inr": 210,
+      "handling": {
+        "temp_c": {
+          "min": -22,
+          "max": -18,
+          "tolerance_min": 15
+        },
+        "humidity_pct": null,
+        "shelf_life_days": 180,
+        "light_sensitive": false,
+        "fragile": false,
+        "controlled": false
+      }
+    },
+    {
+      "id": "G-CURD",
+      "name": "Set Curd (400 g cup)",
+      "unit_value_inr": 45,
+      "handling": {
+        "temp_c": {
+          "min": 2,
+          "max": 6,
+          "tolerance_min": 60
+        },
+        "humidity_pct": null,
+        "shelf_life_days": 21,
+        "light_sensitive": false,
+        "fragile": true,
+        "controlled": false
+      }
+    },
+    {
+      "id": "G-GREENS",
+      "name": "Leafy Greens (palak, 250 g bunch)",
+      "unit_value_inr": 35,
+      "handling": {
+        "temp_c": {
+          "min": 0,
+          "max": 4,
+          "tolerance_min": 45
+        },
+        "humidity_pct": {
+          "max": 95
+        },
+        "shelf_life_days": 3,
+        "light_sensitive": false,
+        "fragile": true,
+        "controlled": false
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "id": "ST-1",
+      "name": "FreshMart Indiranagar",
+      "type": "store",
+      "address": "100 Feet Road, Indiranagar, Bengaluru 560038",
+      "contact_person": "Mr. Rakesh Shetty",
+      "phone": "+910000000001"
+    },
+    {
+      "id": "ST-2",
+      "name": "FreshMart Koramangala",
+      "type": "store",
+      "address": "80 Feet Road, Koramangala 4th Block, Bengaluru 560034",
+      "contact_person": "Ms. Divya Nair",
+      "phone": "+910000000002"
+    }
+  ],
+  "carriers": [
+    {
+      "id": "CR-9",
+      "name": "ChillWheels Distribution",
+      "dispatcher_name": "Mr. Imran Pasha",
+      "phone": "+910000000003"
+    }
+  ],
+  "shipments": [
+    {
+      "id": "SHP-2001",
+      "origin": "FreshMart Regional DC, Nelamangala, Bengaluru",
+      "destination_id": "ST-1",
+      "carrier_id": "CR-9",
+      "vehicle": "KA-02-EF-7781 (chiller truck)",
+      "eta_hours": 2.0,
+      "batches": [
+        {
+          "batch_id": "B-MILK-55",
+          "product_id": "G-MILK",
+          "units": 900,
+          "expiry_date": "+1d"
+        },
+        {
+          "batch_id": "B-GREENS-08",
+          "product_id": "G-GREENS",
+          "units": 400,
+          "expiry_date": "+0d"
+        },
+        {
+          "batch_id": "B-CURD-14",
+          "product_id": "G-CURD",
+          "units": 300,
+          "expiry_date": "+6d"
+        }
+      ]
+    },
+    {
+      "id": "SHP-2002",
+      "origin": "FreshMart Regional DC, Nelamangala, Bengaluru",
+      "destination_id": "ST-2",
+      "carrier_id": "CR-9",
+      "vehicle": "KA-03-GH-3390 (deep-freeze truck)",
+      "eta_hours": 3.0,
+      "batches": [
+        {
+          "batch_id": "B-ICE-21",
+          "product_id": "G-ICE",
+          "units": 240,
+          "expiry_date": "+120d"
+        }
+      ]
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "DIST-1",
+      "name": "Nandini Dairy Depot (Bengaluru)",
+      "city": "Bengaluru (Yeshwanthpur)",
+      "contact_person": "Mr. Basavaraj K",
+      "phone": "+910000000011",
+      "approved": true,
+      "stock": {
+        "G-MILK": 2000,
+        "G-ICE": 0,
+        "G-CURD": 800,
+        "G-GREENS": 0
+      },
+      "eta_hours": {
+        "G-MILK": 2,
+        "G-ICE": 6,
+        "G-CURD": 2,
+        "G-GREENS": 6
+      }
+    },
+    {
+      "id": "DIST-2",
+      "name": "Hopcoms Fresh Produce",
+      "city": "Bengaluru (Lalbagh)",
+      "contact_person": "Ms. Shubha Rao",
+      "phone": "+910000000012",
+      "approved": true,
+      "stock": {
+        "G-MILK": 0,
+        "G-ICE": 0,
+        "G-CURD": 0,
+        "G-GREENS": 1200
+      },
+      "eta_hours": {
+        "G-MILK": 5,
+        "G-ICE": 9,
+        "G-CURD": 5,
+        "G-GREENS": 3
+      }
+    },
+    {
+      "id": "DIST-3",
+      "name": "Coldchain Foods Pvt Ltd",
+      "city": "Bengaluru (Peenya)",
+      "contact_person": "Mr. Naveen Gowda",
+      "phone": "+910000000013",
+      "approved": true,
+      "stock": {
+        "G-MILK": 600,
+        "G-ICE": 500,
+        "G-CURD": 400,
+        "G-GREENS": 300
+      },
+      "eta_hours": {
+        "G-MILK": 4,
+        "G-ICE": 4,
+        "G-CURD": 4,
+        "G-GREENS": 5
+      }
+    },
+    {
+      "id": "DIST-4",
+      "name": "Mandi Surplus Traders (UNAPPROVED decoy)",
+      "city": "Bengaluru (KR Market)",
+      "contact_person": "Unverified vendor",
+      "phone": "+910000000014",
+      "approved": false,
+      "stock": {
+        "G-MILK": 9999,
+        "G-ICE": 9999,
+        "G-CURD": 9999,
+        "G-GREENS": 9999
+      },
+      "eta_hours": {
+        "G-MILK": 1,
+        "G-ICE": 1,
+        "G-CURD": 1,
+        "G-GREENS": 1
+      }
+    }
+  ]
+}
